@@ -1,4 +1,6 @@
-const amountPerUnit = [["PENNY", 0.01], ["NICKEL", 0.05], ["DIME", 0.1], ["QUARTER", 0.25], ["ONE", 1], ["FIVE", 5], ["TEN", 10], ["TWENTY", 20], ["ONE HUNDRED", 100]]
+const x = 1
+
+const amountPerUnit = [["PENNY", 0.01], ["NICKEL", 0.05*x], ["DIME", 0.1*x], ["QUARTER", 0.25*x], ["ONE", 1*x], ["FIVE", 5*x], ["TEN", 10*x], ["TWENTY", 20*x], ["ONE HUNDRED", 100*x]]
 
 function getAmountPerUnit(amountPerUnit, totalAmount){
   
@@ -12,76 +14,59 @@ function getAmountPerUnit(amountPerUnit, totalAmount){
   return totalAmountPerUnit;
 }
 
-// function getTotalCash(notConvertedCash){
-//   let totalCash;
-
-//   for(let i = notConvertedCash.length; i > 0; i--){
-//     while(notConvertedCash[i - 1][1] !== 0){
-//       totalCash += amountPerUnit[i]
-//       notConvertedCash[i][1] -= amountPerUnit[i]
-//     }
-//   }
-
-//   return totalCash;
-// }
-
-
-// function changeConverter(price, cash, cashInDrawer, )
-
-
-// purchase price: Price - Value of the product;
-// accepted payment: Cash - Money delivered to the attendant;
-// cash in drawer: Cid - Money in the drawer.
-
-  // for(let i = change.length; i >= 0; i--){
-  //   change[i - 1][1] = getTotalCash(cash, cid, [i -1][1], amountPerUnit[change.length - 1],)   
-  // }
-  
-  // console.log(getTotalCash(cid))
-
-
-
 function checkCashRegister(price, cash, cid) {
-  // let change = [["PENNY", 0], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]];
 
   let change = [];
-  let status;
+  let status = 'INSUFFICIENT_FUNDS';
 
-  let changeToBeAchieved = cash - price;
+  const changeToBeAchieved = cash - price;
   let currentTotalChange = 0;
+  let leftChangeToBeFilled = cash - price;
 
+  // console.log('leftChangeToBeFilled', leftChangeToBeFilled)
   for(let i = cid.length; i > 0; i--){
-
-    if(cid[i - 1][1] > changeToBeAchieved){
-      console.log('Change to be achieved: ', changeToBeAchieved)
-      console.log('cid ', cid[i - 1][1])
-      let amountUsedAsChange = 0; 
-      while(cid[i - 1][1] > amountPerUnit[i - 1][1]){
-
-        // amountUsedAsChange += cid[i - 1][1] - amountPerUnit[i - 1][1]
-        // change[i - 1][1] += amountUsedAsChange;
-        // cid[i - 1][1] -= amountUsedAsChange;
-        // currentTotalChange += amountUsedAsChange;
-        // changeToBeAchieved -= amountUsedAsChange;
-        amountUsedAsChange += amountPerUnit[i - 1][1];
-        cid[i - 1] -= amountPerUnit[i - 1][1];
-        currentTotalChange += amountPerUnit[i - 1][1];
-        changeToBeAchieved -= amountPerUnit[i - 1][1];
-
-        if(currentTotalChange === changeToBeAchieved){
-          return {status: 'price achieved', change: change}
-        }
+    // console.log('cid[i - 1][1]', cid[i - 1][1])
+    let loopAmountToBeAdded = 0;
+    // while(cid[i - 1][1] <= leftChangeToBeFilled && cid[i - 1][1] > 0){
+      
+    while(cid[i - 1][1] > 0 && leftChangeToBeFilled >= amountPerUnit[i - 1][1]){
+      console.log('While operation -------------- before changes ', i)
+      console.log('LeftChangeToBeFilled: ', leftChangeToBeFilled)
+      console.log('cid[i - 1][1]', cid[i - 1][1])
+      console.log('While operation -------------- ', i)
+      cid[i - 1][1] = cid[i - 1][1] - amountPerUnit[i - 1][1];
+      currentTotalChange = currentTotalChange + amountPerUnit[i - 1][1];
+      leftChangeToBeFilled = leftChangeToBeFilled - amountPerUnit[i - 1][1];
+      loopAmountToBeAdded = loopAmountToBeAdded + amountPerUnit[i - 1][1];
+      console.log('While operation -------------- after changes ', i)
+      console.log('LeftChangeToBeFilled: ', leftChangeToBeFilled)
+      console.log('cid[i - 1][1]', cid[i - 1][1])
+      console.log('While operation -------------- ', i)
+      if(leftChangeToBeFilled < 0.01 && leftChangeToBeFilled > 0.001){
+        leftChangeToBeFilled = 0.01
       }
-
-      if(amountUsedAsChange !== 0){
-        change.push([amountPerUnit[i - 1][0], amountUsedAsChange])
-      }
-
     }
- 
+    if(loopAmountToBeAdded !== 0){
+      change.push([cid[i-1][0], loopAmountToBeAdded])
+      console.log('Added a ', cid[i-1][0], ' on loop ', i, ' with value ', loopAmountToBeAdded)
+    }
+    if(leftChangeToBeFilled === 0){
+      status = 'OPEN'
+    }
+   
   }
-  console.log({status: 'OPEN', change: change})
-  return {status: 'OPEN', change: change};
+  // if(leftChangeToBeFilled === 0){
+    // return {status: open}
+  // }
+  if(leftChangeToBeFilled > 0){
+    change = []
+  }
+  // if(leftChangeToBeFilled === 0)
+  console.log('CHANGE: ', change)
+  return {status: status, change: change};
 }
 
-checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
+// checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
+
+checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]])
+
